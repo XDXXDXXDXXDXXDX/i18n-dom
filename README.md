@@ -8,7 +8,7 @@ i18n-dom implements functions based on text nodes, so you only need to initializ
 
 When you add nodes or modify nodes, the tool will silently convert for you in the background, you only need to use your default language to develop.
 
-⭐️ There is almost no need to consider internationalization during development;
+⭐️ No need to assign a separate key to each text;
 ⭐️ Very small, only 673B after compression;
 ⭐️ Independent of framework, based on web api, can be used in browser environment.
 
