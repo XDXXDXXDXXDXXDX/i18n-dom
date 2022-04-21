@@ -8,17 +8,30 @@ i18n-dom implements functions based on text nodes, so you only need to initializ
 
 When you add nodes or modify nodes, the tool will silently convert for you in the background, you only need to use your default language to develop.
 
+⭐️ There is almost no need to consider internationalization during development;
+⭐️ Very small, only 673B after compression;
+⭐️ Independent of framework, based on web api, can be used in browser environment.
+
 ## Install
 
 ```sh
 npm install i18n-dom
 ```
 
+## Load from CDN
+
+```html
+<script src="https://unpkg.com/i18n-dom@0.1.2/dist/i18n-dom.min.js"></script>
+```
+
+You can access I18n through the global class I18nDOM
+
 ## Usage
 
 ```js
 import I18n from "i18n-dom";
 
+// If it is in the browser, you need to change I18n to I18nDOM
 const i18n = new I18n({
   resource: {
     en: ["Hello World!", "Second paragraph of text"],
