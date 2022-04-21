@@ -58,7 +58,7 @@ That's all!
 
 ### I18n Options
 
-| key          | type        | default                             | description                                                                                                                                           |
+| Key          | Type        | Default                             | Description                                                                                                                                           |
 | ------------ | ----------- | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
 | resource     | object      | {}                                  | The key is the language shorthand, and the value is an array containing all the text. The order of text needs to be consistent in different languages |
 | attachNode   | HTMLElement | document.body                       | The root node of the text node that needs to be translated                                                                                            |
