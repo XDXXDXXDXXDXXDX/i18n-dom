@@ -70,7 +70,7 @@ class I18n {
     const text = node.data;
     const nextNode = node.nextSibling;
     let macroKeyContent = "";
-    if (nextNode && nextNode.nodeType === 8) {
+    if (nextNode?.nodeType === 8) {
       const comment = nextNode.data;
       const key = comment.match(/I18NDOM_KEY\s[^\sI18NDOM_]+/)[0];
       if (key) {
@@ -107,7 +107,9 @@ class I18n {
             // TODO: Replace dynamic data in a string
           }
         });
-        comment = document.createComment(text.substring(matchedMacro[0].index));
+        comment = document.createComment(
+          text.substring(matchedMacro[0].index + 1)
+        ); // Ignore a leading space
         result = text.substring(0, matchedMacro[0].index);
       }
 
@@ -115,7 +117,12 @@ class I18n {
     }
 
     if (comment) {
-      node.after(comment);
+      const nextNode = node.nextSibling;
+      if (nextNode?.nodeType === 8 && nextNode.data.includes("I18NDOM_")) {
+        nextNode.replaceWith(comment);
+      } else {
+        node.after(comment);
+      }
     }
   }
 }
