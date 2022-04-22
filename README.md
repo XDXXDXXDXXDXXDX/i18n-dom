@@ -68,3 +68,61 @@ That's all!
 ### i18n.changeLanguage(lang: string)
 
 Change the language displayed on the page to lang.
+
+## Macro
+
+Macros are mainly used to solve some more complex functions or problems, such as synonyms, dynamic replacement text, etc.
+
+🦌More macros are in development!
+
+### I18NDOM_KEY
+
+Fix translation errors caused by synonyms
+
+It is more common for the same text to have different meanings, such as animal:
+
+```js
+const i18n = new I18n({
+  resource: {
+    en: ["animal", "animal"],
+    zh: ["动物", "野兽"],
+    ru: ["животное", "зверь"],
+  },
+});
+```
+
+Because there are two identical animals in the English list, there will be an error when switching languages.
+
+The first solution, recommended, is not to use the same words, but to use synonyms instead. For example:
+
+```js
+const i18n = new I18n({
+  resource: {
+    en: ["animal", "beast"],
+    zh: ["动物", "野兽"],
+    ru: ["животное", "зверь"],
+  },
+});
+```
+
+The second way is to use I18NDOM_KEY. Add a special tag `I18NDOM_KEY + KeyName` to each language list for synonyms. For example:
+
+```js
+const i18n = new I18n({
+  resource: {
+    en: ["animal", "animal I18NDOM_KEY anyString"],
+    zh: ["动物", "野兽 I18NDOM_KEY anyString"],
+    ru: ["животное", "зверь I18NDOM_KEY anyString"],
+  },
+});
+```
+
+Then use the modified text in the code, the display will automatically hide the macro related content.
+
+```html
+<span>animal</span> <span>animal I18NDOM_KEY anyString</span>
+```
+
+## Need help or need more features
+
+You can visit [the issue page of the code repository](https://github.com/XDXXDXXDXXDXXDX/i18n-dom/issues) and leave a message, I will check it regularly and look forward to your visit.
