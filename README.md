@@ -21,7 +21,7 @@ npm install i18n-dom
 ## Load from CDN
 
 ```html
-<script src="https://unpkg.com/i18n-dom@0.1.2/dist/i18n-dom.min.js"></script>
+<script src="https://unpkg.com/i18n-dom/dist/i18n-dom.min.js"></script>
 ```
 
 You can access I18n through the global class I18nDOM
