@@ -145,7 +145,7 @@ const i18n = new I18nDOM({
 });
 ```
 
-Then use I18NDOM_DATA to insert the data content in the code, dynamically replace the content behind name= and age=
+Then use I18NDOM_DATA to insert the data content in the code, dynamically replace the content behind `name=` and `age=`
 
 ```html
 <span
