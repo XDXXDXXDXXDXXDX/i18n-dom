@@ -66,21 +66,6 @@ class I18n {
     }
   }
 
-  getIndex(node, lang) {
-    const text = node.data;
-    const nextNode = node.nextSibling;
-    let macroKeyContent = "";
-    if (nextNode?.nodeType === 8) {
-      const comment = nextNode.data;
-      const key = comment.match(/I18NDOM_KEY\s[^\sI18NDOM_]+/)[0];
-      if (key) {
-        macroKeyContent = ` ${key}`;
-      }
-    }
-
-    return this.resource[lang].indexOf(`${text}${macroKeyContent}`);
-  }
-
   translateNodeTree(root, originalLanguage) {
     const allNode = getAllTextNodes(root);
     allNode.forEach((node) => {
@@ -88,7 +73,21 @@ class I18n {
     });
   }
   translateTextNode(node, originalLanguage) {
-    const index = this.getIndex(node, originalLanguage);
+    const originalText = node.data;
+    const nextNode = node.nextSibling;
+    let macroKeyContent = "";
+    if (nextNode?.nodeType === 8) {
+      const comment = nextNode.data;
+      const key = comment.match(/I18NDOM_KEY\s(.(?!I18NDOM_))+/)[0];
+      if (key) {
+        macroKeyContent = ` ${key}`;
+      }
+    }
+
+    const index = this.resource[originalLanguage].indexOf(
+      `${originalText}${macroKeyContent}`
+    );
+
     const text = this.resource[this.language][index];
 
     let result = text;
@@ -96,7 +95,7 @@ class I18n {
 
     if (result) {
       const matchedMacro = [
-        ...text.matchAll(/\sI18NDOM_([^\s]+)\s([^\sI18NDOM_]+)/g),
+        ...text.matchAll(/\sI18NDOM_([\S]+)\s((.(?!I18NDOM_))+)/g),
       ];
 
       if (matchedMacro.length) {
@@ -117,7 +116,6 @@ class I18n {
     }
 
     if (comment) {
-      const nextNode = node.nextSibling;
       if (nextNode?.nodeType === 8 && nextNode.data.includes("I18NDOM_")) {
         nextNode.replaceWith(comment);
       } else {
