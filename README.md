@@ -163,6 +163,27 @@ When you use some data-responsive frameworks like React, you need to use some ha
 >
 ```
 
+### I18NDOM_IGNORE
+
+Sometimes you want a piece of text not to be affected by this tool, you can use this macro, it will prohibit all translation and interpolation operations, and only remove the macro-related content from the text when it is displayed
+
+```js
+const i18n = new I18nDOM({
+  htmlLanguage: "en", // The language in which the web page is written
+  resource: {
+    en: ["Hello World!"],
+    zh: ["你好世界！"],
+    ru: ["Привет, мир!"],
+  },
+});
+```
+
+The text below will not be automatically translated following language changes
+
+```html
+<span>Hello World! I18NDOM_IGNORE</span>
+```
+
 ## Need help or need more features
 
 You can visit [the issue page of the code repository](https://github.com/XDXXDXXDXXDXXDX/i18n-dom/issues) and leave a message, I will check it regularly.

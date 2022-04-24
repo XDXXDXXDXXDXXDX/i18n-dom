@@ -81,8 +81,17 @@ class I18n {
       ...text.matchAll(/\sI18NDOM_(\S+)\s((.(?!I18NDOM_))+)/g),
     ];
 
-    const hasMacro = !!matchedMacro.length;
-    const startIndex = matchedMacro[0]?.index;
+    const matchedIgnore = text.match(" I18NDOM_IGNORE");
+    const isIgnore = !!matchedIgnore;
+    const hasMacro = !!matchedMacro.length || isIgnore;
+    let startIndex = matchedMacro[0]?.index;
+    if (isIgnore) {
+      startIndex =
+        matchedMacro[0]?.index > matchedIgnore.index
+          ? matchedIgnore.index
+          : matchedMacro[0]?.index;
+    }
+
     let matchedData = [];
     let matchedKey = "";
 
@@ -104,10 +113,16 @@ class I18n {
 
     return {
       hasMacro,
+      isIgnore,
       startIndex,
       matchedData,
       matchedKey,
     };
+  }
+
+  clearMacroInfo(text) {
+    const macroStartIndex = text.indexOf(" I18NDOM_");
+    return macroStartIndex !== -1 ? text.substring(0, macroStartIndex) : text;
   }
 
   translateNodeTree(root, originalLanguage) {
@@ -125,16 +140,21 @@ class I18n {
     let textInResource = originalText;
     let comment = null;
     let dataContent = [];
+    let ignoreMacro = false;
 
-    const { hasMacro, matchedData, matchedKey, startIndex } =
+    const { hasMacro, matchedData, matchedKey, startIndex, isIgnore } =
       this.getMacroContent(originalText);
 
     if (hasMacro) {
+      ignoreMacro = isIgnore;
       dataContent = matchedData;
       comment = document.createComment(originalText.substring(startIndex));
       textInResource = `${originalText.substring(0, startIndex)}${matchedKey}`;
     } else if (hasI18NDOMComment) {
-      const { matchedKey, matchedData } = this.getMacroContent(nextNode.data);
+      const { matchedKey, matchedData, isIgnore } = this.getMacroContent(
+        nextNode.data
+      );
+      ignoreMacro = isIgnore;
       dataContent = matchedData;
       if (matchedData.length) {
         matchedData.forEach((data) => {
@@ -145,22 +165,23 @@ class I18n {
       textInResource = `${textInResource}${matchedKey}`;
     }
 
-    const index = this.resource[originalLanguage].indexOf(textInResource);
     let result = textInResource;
-    if (index !== -1) {
-      result = this.resource[this.language][index];
-      const macroStartIndex = result.indexOf(" I18NDOM_");
-      if (macroStartIndex !== -1) {
-        result = result.substring(0, macroStartIndex);
+    if (ignoreMacro) {
+      result = this.clearMacroInfo(result);
+    } else {
+      const index = this.resource[originalLanguage].indexOf(textInResource);
+      if (index !== -1) {
+        result = this.clearMacroInfo(this.resource[this.language][index]);
+      }
+
+      if (dataContent.length) {
+        dataContent.forEach((data) => {
+          const { key, value } = data;
+          result = result.replaceAll(`%${key}%`, value);
+        });
       }
     }
 
-    if (dataContent.length) {
-      dataContent.forEach((data) => {
-        const { key, value } = data;
-        result = result.replaceAll(`%${key}%`, value);
-      });
-    }
     node.data = result;
 
     if (comment) {
