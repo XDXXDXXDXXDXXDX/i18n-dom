@@ -39,10 +39,8 @@ class I18n {
       this.startTextObserve();
     });
 
-    if (this.language !== this.htmlLanguage) {
-      this.startNodeObserve();
-      this.startNodeObserve();
-    }
+    this.startNodeObserve();
+    this.startNodeObserve();
   }
 
   startTextObserve() {
@@ -55,14 +53,26 @@ class I18n {
   startNodeObserve() {
     this.nodeObserver.observe(this.attachNode, observerNodeOptions);
   }
+  stopNodeObserve() {
+    this.nodeObserver.disconnect();
+  }
+
+  startObserve() {
+    this.startTextObserve();
+    this.startNodeObserve();
+  }
+  stopObserve() {
+    this.stopTextObserve();
+    this.stopNodeObserve();
+  }
 
   changeLanguage(lang) {
     if (this.language !== lang) {
-      this.startNodeObserve();
-      this.startNodeObserve();
       const originalLanguage = this.language;
       this.language = lang;
+      this.stopObserve();
       this.translateNodeTree(this.attachNode, originalLanguage);
+      this.startObserve();
     }
   }
 
@@ -75,48 +85,57 @@ class I18n {
   translateTextNode(node, originalLanguage) {
     const originalText = node.data;
     const nextNode = node.nextSibling;
-    let macroKeyContent = "";
-    if (nextNode?.nodeType === 8) {
-      const comment = nextNode.data;
-      const key = comment.match(/I18NDOM_KEY\s(.(?!I18NDOM_))+/)[0];
-      if (key) {
-        macroKeyContent = ` ${key}`;
-      }
-    }
+    const hasI18NDOMComment =
+      nextNode?.nodeType === 8 && nextNode.data.includes("I18NDOM_");
 
-    const index = this.resource[originalLanguage].indexOf(
-      `${originalText}${macroKeyContent}`
-    );
-
-    const text = this.resource[this.language][index];
-
-    let result = text;
+    let textInResource = originalText;
     let comment = null;
 
-    if (result) {
-      const matchedMacro = [
-        ...text.matchAll(/\sI18NDOM_([\S]+)\s((.(?!I18NDOM_))+)/g),
+    const matchedMacro = [
+      ...originalText.matchAll(/\sI18NDOM_([\S]+)\s((.(?!I18NDOM_))+)/g),
+    ];
+
+    if (matchedMacro.length) {
+      let macroKEY = "";
+      matchedMacro.forEach((info) => {
+        // info = ["match content", "main macro key", "main content"]
+        let key = info[1];
+        if (key === "DATA") {
+          // TODO: Replace dynamic data in a string
+        } else if (key === "KEY") {
+          macroKEY = info[0];
+        }
+      });
+      comment = document.createComment(
+        originalText.substring(matchedMacro[0].index + 1)
+      ); // Ignore a leading space
+
+      textInResource = `${originalText.substring(
+        0,
+        matchedMacro[0].index
+      )}${macroKEY}`;
+    } else if (hasI18NDOMComment) {
+      const matchedMacroKEY = [
+        ...nextNode.data.matchAll(/I18NDOM_KEY\s((.(?!I18NDOM_))+)/g),
       ];
-
-      if (matchedMacro.length) {
-        matchedMacro.forEach((info) => {
-          // info = ["match content", "main macro key", "main content"]
-          let key = info[1];
-          if ((key = "DATA")) {
-            // TODO: Replace dynamic data in a string
-          }
-        });
-        comment = document.createComment(
-          text.substring(matchedMacro[0].index + 1)
-        ); // Ignore a leading space
-        result = text.substring(0, matchedMacro[0].index);
-      }
-
-      node.data = result;
+      matchedMacroKEY.forEach((info) => {
+        textInResource = `${textInResource} ${info[0]}`;
+      });
     }
 
+    const index = this.resource[originalLanguage].indexOf(textInResource);
+    let result = textInResource;
+    if (index !== -1) {
+      result = this.resource[this.language][index];
+      const macroStartIndex = result.indexOf(" I18NDOM_");
+      if (macroStartIndex !== -1) {
+        result = result.substring(0, macroStartIndex);
+      }
+    }
+    node.data = result;
+
     if (comment) {
-      if (nextNode?.nodeType === 8 && nextNode.data.includes("I18NDOM_")) {
+      if (hasI18NDOMComment) {
         nextNode.replaceWith(comment);
       } else {
         node.after(comment);
