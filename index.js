@@ -1,4 +1,5 @@
 import { getAllTextNodes } from "./utils/index.js";
+import { getDefaultLanguage, defaultDetectOptions } from "./utils/detect.js";
 
 const observerNodeOptions = {
   childList: true,
@@ -11,11 +12,20 @@ const observerTextOptions = {
 };
 
 class I18n {
-  constructor({ attachNode, htmlLanguage, resource, language }) {
+  constructor({
+    attachNode,
+    htmlLanguage,
+    resource,
+    language,
+    fallbackLng,
+    detection,
+  }) {
     this.attachNode = attachNode || document.body;
     this.htmlLanguage = htmlLanguage || document.documentElement.lang || "en";
-    this.language = language || this.htmlLanguage;
     this.resource = resource;
+    this.fallbackLng = fallbackLng;
+    this.detectOptions = Object.assign({}, defaultDetectOptions, detection);
+    this.setLanguage(language || getDefaultLanguage(this.detectOptions));
 
     this.textObserver = new MutationObserver((mutationList) => {
       this.stopTextObserve();
@@ -66,10 +76,26 @@ class I18n {
     this.stopNodeObserve();
   }
 
+  setLanguage(lang) {
+    const langList = Object.keys(this.resource);
+    let result = this.fallbackLng || langList[0];
+    if (langList.indexOf(lang) !== -1) {
+      result = lang;
+    }
+
+    this.language = result;
+    const { caches, lookupLocalStorage } = this.detectOptions;
+    caches.forEach((key) => {
+      if (key === "localStorage") {
+        localStorage[lookupLocalStorage] = result;
+      }
+    });
+  }
+
   changeLanguage(lang) {
     if (this.language !== lang) {
       const originalLanguage = this.language;
-      this.language = lang;
+      this.setLanguage(lang);
       this.stopObserve();
       this.translateNodeTree(this.attachNode, originalLanguage);
       this.startObserve();

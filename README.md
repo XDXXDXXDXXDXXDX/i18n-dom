@@ -58,22 +58,31 @@ That's all!
 
 ### I18n Options
 
-| Key          | Type        | Default                             | Description                                                                                                                                           |
-| ------------ | ----------- | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| resource     | object      | {}                                  | The key is the language shorthand, and the value is an array containing all the text. The order of text needs to be consistent in different languages |
-| attachNode   | HTMLElement | document.body                       | The root node of the text node that needs to be translated                                                                                            |
-| htmlLanguage | string      | document.documentElement.lang or en | Default language for web pages                                                                                                                        |
-| language     | string      | htmlLanguage                        | The current language of the page                                                                                                                      |
+| Key          | Default                             | Description                                                                                                                                           |
+| ------------ | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| resource     | {}                                  | The key is the language shorthand, and the value is an array containing all the text. The order of text needs to be consistent in different languages |
+| attachNode   | document.body                       | The root node of the text node that needs to be translated                                                                                            |
+| htmlLanguage | document.documentElement.lang or en | Default language for web pages                                                                                                                        |
+| language     | auto detect                         | The current language of the page                                                                                                                      |
+| fallbackLng  | first lang in resource              | The language to display when the detected language or the set language is not in the resource                                                         |
+| detection    |                                     | Option to detect the language displayed by default, see the detection section for details                                                             |
 
 ### i18n.changeLanguage(lang: string)
 
 Change the language displayed on the page to lang.
 
+## Advanced use
+
+🐑 If you run into problems or need more advanced features, check out the Macro section below;
+🐑 This tool will automatically detect the language used by the user, and will also automatically save the language selected by the user. If you need to customize the detection function, please check the following Detection section below.
+
+## Detection
+
+At present, the language selected by the user will be saved in `localStorage.i18nDOMLng` by default, and the custom configuration is under development
+
 ## Macro
 
 Macros are mainly used to solve some more complex functions or problems, such as synonyms, dynamic replacement text, etc.
-
-🦌More macros are in development!
 
 ### I18NDOM_KEY
 
