@@ -76,6 +76,40 @@ class I18n {
     }
   }
 
+  getMacroContent(text) {
+    const matchedMacro = [
+      ...text.matchAll(/\sI18NDOM_(\S+)\s((.(?!I18NDOM_))+)/g),
+    ];
+
+    const hasMacro = !!matchedMacro.length;
+    const startIndex = matchedMacro[0]?.index;
+    let matchedData = [];
+    let matchedKey = "";
+
+    if (hasMacro) {
+      matchedMacro.forEach((info) => {
+        // info = ["match content", "main macro key", "main content"]
+        let key = info[1];
+        if (key === "DATA") {
+          const matchedDetail = [...info[2].matchAll(/(\S+)=(.*)/g)][0];
+          matchedData.push({
+            key: matchedDetail[1],
+            value: matchedDetail[2],
+          });
+        } else if (key === "KEY") {
+          matchedKey = matchedKey + info[0];
+        }
+      });
+    }
+
+    return {
+      hasMacro,
+      startIndex,
+      matchedData,
+      matchedKey,
+    };
+  }
+
   translateNodeTree(root, originalLanguage) {
     const allNode = getAllTextNodes(root);
     allNode.forEach((node) => {
@@ -90,37 +124,25 @@ class I18n {
 
     let textInResource = originalText;
     let comment = null;
+    let dataContent = [];
 
-    const matchedMacro = [
-      ...originalText.matchAll(/\sI18NDOM_([\S]+)\s((.(?!I18NDOM_))+)/g),
-    ];
+    const { hasMacro, matchedData, matchedKey, startIndex } =
+      this.getMacroContent(originalText);
 
-    if (matchedMacro.length) {
-      let macroKEY = "";
-      matchedMacro.forEach((info) => {
-        // info = ["match content", "main macro key", "main content"]
-        let key = info[1];
-        if (key === "DATA") {
-          // TODO: Replace dynamic data in a string
-        } else if (key === "KEY") {
-          macroKEY = info[0];
-        }
-      });
-      comment = document.createComment(
-        originalText.substring(matchedMacro[0].index + 1)
-      ); // Ignore a leading space
-
-      textInResource = `${originalText.substring(
-        0,
-        matchedMacro[0].index
-      )}${macroKEY}`;
+    if (hasMacro) {
+      dataContent = matchedData;
+      comment = document.createComment(originalText.substring(startIndex));
+      textInResource = `${originalText.substring(0, startIndex)}${matchedKey}`;
     } else if (hasI18NDOMComment) {
-      const matchedMacroKEY = [
-        ...nextNode.data.matchAll(/I18NDOM_KEY\s((.(?!I18NDOM_))+)/g),
-      ];
-      matchedMacroKEY.forEach((info) => {
-        textInResource = `${textInResource} ${info[0]}`;
-      });
+      const { matchedKey, matchedData } = this.getMacroContent(nextNode.data);
+      dataContent = matchedData;
+      if (matchedData.length) {
+        matchedData.forEach((data) => {
+          const { key, value } = data;
+          textInResource = textInResource.replaceAll(value, `%${key}%`);
+        });
+      }
+      textInResource = `${textInResource}${matchedKey}`;
     }
 
     const index = this.resource[originalLanguage].indexOf(textInResource);
@@ -131,6 +153,13 @@ class I18n {
       if (macroStartIndex !== -1) {
         result = result.substring(0, macroStartIndex);
       }
+    }
+
+    if (dataContent.length) {
+      dataContent.forEach((data) => {
+        const { key, value } = data;
+        result = result.replaceAll(`%${key}%`, value);
+      });
     }
     node.data = result;
 

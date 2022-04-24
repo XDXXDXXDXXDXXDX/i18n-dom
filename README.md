@@ -29,10 +29,10 @@ You can access I18n through the global class I18nDOM
 ## Usage
 
 ```js
-import I18n from "i18n-dom";
+import I18nDOM from "i18n-dom";
 
-// If it is in the browser, you need to change I18n to I18nDOM
-const i18n = new I18n({
+const i18n = new I18nDOM({
+  htmlLanguage: "en", // The language in which the web page is written
   resource: {
     en: ["Hello World!", "Second paragraph of text"],
     zh: ["你好世界！", "第二段文本"],
@@ -77,12 +77,13 @@ Macros are mainly used to solve some more complex functions or problems, such as
 
 ### I18NDOM_KEY
 
-Fix translation errors caused by synonyms
+Fix translation errors caused by synonyms.
 
 It is more common for the same text to have different meanings, such as animal:
 
 ```js
-const i18n = new I18n({
+const i18n = new I18nDOM({
+  htmlLanguage: "en",
   resource: {
     en: ["animal", "animal"],
     zh: ["动物", "野兽"],
@@ -93,10 +94,11 @@ const i18n = new I18n({
 
 Because there are two identical animals in the English list, there will be an error when switching languages.
 
-The first solution, recommended, is not to use the same words, but to use synonyms instead. For example:
+The first solution, recommended, is not to use the same words, but to use synonyms instead, e.g.
 
 ```js
-const i18n = new I18n({
+const i18n = new I18nDOM({
+  htmlLanguage: "en",
   resource: {
     en: ["animal", "beast"],
     zh: ["动物", "野兽"],
@@ -105,10 +107,11 @@ const i18n = new I18n({
 });
 ```
 
-The second way is to use I18NDOM_KEY. Add a special tag `I18NDOM_KEY + KeyName` to each language list for synonyms. For example:
+The second way is to use I18NDOM_KEY. Add a special tag `I18NDOM_KEY + KeyName` to each language list for synonyms, e.g.
 
 ```js
-const i18n = new I18n({
+const i18n = new I18nDOM({
+  htmlLanguage: "en",
   resource: {
     en: ["animal", "animal I18NDOM_KEY anyString"],
     zh: ["动物", "野兽 I18NDOM_KEY anyString"],
@@ -123,6 +126,43 @@ Then use the modified text in the code, the display will automatically hide the 
 <span>animal</span> <span>animal I18NDOM_KEY anyString</span>
 ```
 
+### I18NDOM_DATA
+
+There is dynamic data in the string.
+
+In situations such as displaying user information, you may need to dynamically replace certain words in a sentence.
+
+First, use the symbol `%` to wrap the content that needs to be dynamically replaced:
+
+```js
+const i18n = new I18nDOM({
+  htmlLanguage: "en",
+  resource: {
+    en: ["Welcome %name%! Your age is %age%"],
+    zh: ["欢迎%name%！你的年龄是%age%"],
+    ru: ["Добро пожаловать, %имя%! Ваш возраст: %age%"],
+  },
+});
+```
+
+Then use I18NDOM_DATA to insert the data content in the code, dynamically replace the content behind name= and age=
+
+```html
+<span
+  >Welcome %name%! Your age is %age% I18NDOM_DATA name=Jay Chou I18NDOM_DATA
+  age=18</span
+>
+```
+
+When you use some data-responsive frameworks like React, you need to use some hacks to combine the text into a node to use this macro, the following is used in react:
+
+```html
+<span
+  >{"Welcome %name%! Your age is %age% I18NDOM_DATA name=${name} I18NDOM_DATA
+  age=${age}"}</span
+>
+```
+
 ## Need help or need more features
 
-You can visit [the issue page of the code repository](https://github.com/XDXXDXXDXXDXXDX/i18n-dom/issues) and leave a message, I will check it regularly and look forward to your visit.
+You can visit [the issue page of the code repository](https://github.com/XDXXDXXDXXDXXDX/i18n-dom/issues) and leave a message, I will check it regularly.
