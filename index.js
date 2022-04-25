@@ -1,5 +1,9 @@
 import { getAllTextNodes } from "./utils/index.js";
-import { getDefaultLanguage, defaultDetectOptions } from "./utils/detect.js";
+import {
+  getDefaultLanguage,
+  defaultDetectOptions,
+  saveSelectedLanguage,
+} from "./utils/detect.js";
 
 const observerNodeOptions = {
   childList: true,
@@ -25,7 +29,7 @@ class I18n {
     this.resource = resource;
     this.fallbackLng = fallbackLng;
     this.detectOptions = Object.assign({}, defaultDetectOptions, detection);
-    this.setLanguage(language || getDefaultLanguage(this.detectOptions));
+    this.setLanguage(language || getDefaultLanguage(this.detectOptions), false);
 
     this.textObserver = new MutationObserver((mutationList) => {
       this.stopTextObserve();
@@ -76,7 +80,7 @@ class I18n {
     this.stopNodeObserve();
   }
 
-  setLanguage(lang) {
+  setLanguage(lang, save = true) {
     const langList = Object.keys(this.resource);
     let result = this.fallbackLng || langList[0];
     if (langList.indexOf(lang) !== -1) {
@@ -84,12 +88,7 @@ class I18n {
     }
 
     this.language = result;
-    const { caches, lookupLocalStorage } = this.detectOptions;
-    caches.forEach((key) => {
-      if (key === "localStorage") {
-        localStorage[lookupLocalStorage] = result;
-      }
-    });
+    save && saveSelectedLanguage(result, this.detectOptions);
   }
 
   changeLanguage(lang) {

@@ -54,9 +54,15 @@ Just use your default language normally in your code
 
 That's all!
 
-## API
+## Syntax
 
-### I18n Options
+```js
+new I18nDOM(init);
+```
+
+## Constructor
+
+`init`
 
 | Key          | Default                             | Description                                                                                                                                           |
 | ------------ | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -67,18 +73,26 @@ That's all!
 | fallbackLng  | first lang in resource              | The language to display when the detected language or the set language is not in the resource                                                         |
 | detection    |                                     | Option to detect the language displayed by default, see the detection section for details                                                             |
 
+## API
+
 ### i18n.changeLanguage(lang: string)
 
 Change the language displayed on the page to lang.
 
-## Advanced use
-
-🐑 If you run into problems or need more advanced features, check out the Macro section below;
-🐑 This tool will automatically detect the language used by the user, and will also automatically save the language selected by the user. If you need to customize the detection function, please check the following Detection section below.
-
 ## Detection
 
-At present, the language selected by the user will be saved in `localStorage.i18nDOMLng` by default, and the custom configuration is under development
+By default, the tool will automatically detect the language that needs to be displayed, and automatically save the language selected by the user to `localStorage.i18nDOMLng`. The following are some detection options for you to adjust:
+
+`init.detection`
+
+| Key                  | Default                                                                        | Description                                                                                                                        |
+| -------------------- | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| order                | ["querystring","cookie","localStorage","sessionStorage","navigator","htmlTag"] | Detect the order of languages                                                                                                      |
+| lookupQuerystring    | lng                                                                            | Url search key                                                                                                                     |
+| lookupCookie         | i18n_dom                                                                       | Cookie key                                                                                                                         |
+| lookupLocalStorage   | i18nDOMLng                                                                     | LocalStorage key                                                                                                                   |
+| lookupSessionStorage | i18nDOMLng                                                                     | SessionStorage key                                                                                                                 |
+| caches               | ["localStorage"]                                                               | The location where the language selected by the user needs to be saved, supports querystring、cookie、localStorage、sessionStorage |
 
 ## Macro
 
@@ -193,6 +207,10 @@ The text below will not be automatically translated following language changes
 <span>Hello World! I18NDOM_IGNORE</span>
 ```
 
-## Need help or need more features
+## Need help or need more
 
 You can visit [the issue page of the code repository](https://github.com/XDXXDXXDXXDXXDX/i18n-dom/issues) and leave a message, I will check it regularly.
+
+### Advanced use
+
+🐑 If you run into problems or need more advanced features, check out the Macro section.
