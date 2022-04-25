@@ -83,16 +83,18 @@ Change the language displayed on the page to lang.
 
 By default, the tool will automatically detect the language that needs to be displayed, and automatically save the language selected by the user to `localStorage.i18nDOMLng`. The following are some detection options for you to adjust:
 
+There are mainly six optional values: querystring, cookie, localStorage, sessionStorage, navigator, htmlTag
+
 `init.detection`
 
-| Key                  | Default                                                                        | Description                                                                                                                        |
-| -------------------- | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
-| order                | ["querystring","cookie","localStorage","sessionStorage","navigator","htmlTag"] | Detect the order of languages                                                                                                      |
-| lookupQuerystring    | lng                                                                            | Url search key                                                                                                                     |
-| lookupCookie         | i18n_dom                                                                       | Cookie key                                                                                                                         |
-| lookupLocalStorage   | i18nDOMLng                                                                     | LocalStorage key                                                                                                                   |
-| lookupSessionStorage | i18nDOMLng                                                                     | SessionStorage key                                                                                                                 |
-| caches               | ["localStorage"]                                                               | The location where the language selected by the user needs to be saved, supports querystring、cookie、localStorage、sessionStorage |
+| Key                  | Default                             | Description                                                                                                                        |
+| -------------------- | ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| order                | [all five optional values in order] | Detect the order of languages                                                                                                      |
+| lookupQuerystring    | lng                                 | Url search key                                                                                                                     |
+| lookupCookie         | i18n_dom                            | Cookie key                                                                                                                         |
+| lookupLocalStorage   | i18nDOMLng                          | LocalStorage key                                                                                                                   |
+| lookupSessionStorage | i18nDOMLng                          | SessionStorage key                                                                                                                 |
+| caches               | ["localStorage"]                    | The location where the language selected by the user needs to be saved, supports querystring、cookie、localStorage、sessionStorage |
 
 ## Macro
 
