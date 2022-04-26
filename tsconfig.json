@@ -1,0 +1,9 @@
+{
+  "include": ["src"],
+  "exclude": ["node_modules"],
+  "compilerOptions": {
+    "lib": ["ES2021", "dom"],
+    "downlevelIteration": true,
+    "target": "ES6"
+  }
+}

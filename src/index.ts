@@ -3,6 +3,7 @@ import {
   getDefaultLanguage,
   defaultDetectOptions,
   saveSelectedLanguage,
+  IDetectOptions,
 } from "./utils/detect.js";
 
 const observerNodeOptions = {
@@ -15,7 +16,33 @@ const observerTextOptions = {
   characterData: true,
 };
 
-class I18n {
+interface IInit {
+  attachNode: Node;
+  htmlLanguage: string;
+  resource: object;
+  fallbackLng: string;
+  detection: IDetectOptions;
+  language: string;
+}
+
+interface IMacroContent {
+  hasMacro: boolean;
+  isIgnore: boolean;
+  startIndex: number;
+  matchedData: { key: string; value: string }[];
+  matchedKey: string;
+}
+
+class I18nDOM {
+  attachNode: Node;
+  htmlLanguage: string;
+  resource: object;
+  fallbackLng: string;
+  detectOptions: IDetectOptions;
+  textObserver: MutationObserver;
+  nodeObserver: MutationObserver;
+  language: string;
+
   constructor({
     attachNode,
     htmlLanguage,
@@ -23,7 +50,7 @@ class I18n {
     language,
     fallbackLng,
     detection,
-  }) {
+  }: IInit) {
     this.attachNode = attachNode || document.body;
     this.htmlLanguage = htmlLanguage || document.documentElement.lang || "en";
     this.resource = resource;
@@ -34,7 +61,7 @@ class I18n {
     this.textObserver = new MutationObserver((mutationList) => {
       this.stopTextObserve();
       mutationList.forEach((mutation) => {
-        this.translateTextNode(mutation.target, this.htmlLanguage);
+        this.translateTextNode(mutation.target as Text, this.htmlLanguage);
       });
       this.startTextObserve();
     });
@@ -44,7 +71,7 @@ class I18n {
       mutationList.forEach((mutation) => {
         mutation.addedNodes.forEach((node) => {
           if (node.nodeType === 3) {
-            this.translateTextNode(node, this.htmlLanguage);
+            this.translateTextNode(node as Text, this.htmlLanguage);
           } else {
             this.translateNodeTree(node, this.htmlLanguage);
           }
@@ -80,7 +107,7 @@ class I18n {
     this.stopNodeObserve();
   }
 
-  setLanguage(lang, save = true) {
+  setLanguage(lang: string, save: boolean = true) {
     const langList = Object.keys(this.resource);
     let result = this.fallbackLng || langList[0];
     if (langList.indexOf(lang) !== -1) {
@@ -91,7 +118,7 @@ class I18n {
     save && saveSelectedLanguage(result, this.detectOptions);
   }
 
-  changeLanguage(lang) {
+  changeLanguage(lang: string) {
     if (this.language !== lang) {
       const originalLanguage = this.language;
       this.setLanguage(lang);
@@ -101,7 +128,7 @@ class I18n {
     }
   }
 
-  getMacroContent(text) {
+  getMacroContent(text: string): IMacroContent {
     const matchedMacro = [
       ...text.matchAll(/\sI18NDOM_(\S+)\s((.(?!I18NDOM_))+)/g),
     ];
@@ -145,20 +172,20 @@ class I18n {
     };
   }
 
-  clearMacroInfo(text) {
+  clearMacroInfo(text: string): string {
     const macroStartIndex = text.indexOf(" I18NDOM_");
     return macroStartIndex !== -1 ? text.substring(0, macroStartIndex) : text;
   }
 
-  translateNodeTree(root, originalLanguage) {
+  translateNodeTree(root: Node, originalLanguage: string) {
     const allNode = getAllTextNodes(root);
     allNode.forEach((node) => {
       this.translateTextNode(node, originalLanguage);
     });
   }
-  translateTextNode(node, originalLanguage) {
+  translateTextNode(node: Text, originalLanguage: string) {
     const originalText = node.data;
-    const nextNode = node.nextSibling;
+    const nextNode = node.nextSibling as Comment;
     const hasI18NDOMComment =
       nextNode?.nodeType === 8 && nextNode.data.includes("I18NDOM_");
 
@@ -219,4 +246,4 @@ class I18n {
   }
 }
 
-export default I18n;
+export default I18nDOM;

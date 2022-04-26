@@ -1,6 +1,22 @@
 import { setCookie, getCookie, setSearch, getSearch } from "./index.js";
 
-export const defaultDetectOptions = {
+export interface IDetectOptions {
+  order?: (
+    | "querystring"
+    | "cookie"
+    | "localStorage"
+    | "sessionStorage"
+    | "navigator"
+    | "htmlTag"
+  )[];
+  lookupQuerystring?: string;
+  lookupCookie?: string;
+  lookupLocalStorage?: string;
+  lookupSessionStorage?: string;
+  caches?: ("querystring" | "cookie" | "localStorage" | "sessionStorage")[];
+}
+
+export const defaultDetectOptions: IDetectOptions = {
   order: [
     "querystring",
     "cookie",
@@ -16,7 +32,7 @@ export const defaultDetectOptions = {
   caches: ["localStorage"],
 };
 
-export function getDefaultLanguage(options) {
+export function getDefaultLanguage(options: IDetectOptions): string {
   const {
     order,
     lookupQuerystring,
@@ -24,7 +40,8 @@ export function getDefaultLanguage(options) {
     lookupLocalStorage,
     lookupSessionStorage,
   } = options;
-  let language = "";
+
+  let language: string = "";
   for (let i = 0; i < order.length; i++) {
     const key = order[i];
     if (key === "querystring") {
@@ -49,7 +66,10 @@ export function getDefaultLanguage(options) {
   return language;
 }
 
-export function saveSelectedLanguage(lang, detectOptions) {
+export function saveSelectedLanguage(
+  lang: string,
+  detectOptions: IDetectOptions
+) {
   const {
     caches,
     lookupQuerystring,
@@ -57,6 +77,7 @@ export function saveSelectedLanguage(lang, detectOptions) {
     lookupLocalStorage,
     lookupSessionStorage,
   } = detectOptions;
+
   caches.forEach((key) => {
     if (key === "localStorage") {
       localStorage[lookupLocalStorage] = lang;

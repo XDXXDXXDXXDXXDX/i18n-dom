@@ -2,7 +2,7 @@
   "name": "i18n-dom",
   "version": "0.2.1",
   "description": "The most worry-free i18n tool in the browser.",
-  "main": "index.js",
+  "main": "./dist/i18n-dom.esm.js",
   "scripts": {
     "build": "rollup -c",
     "prepare": "husky install"
@@ -23,6 +23,7 @@
   "homepage": "https://github.com/XDXXDXXDXXDXXDX/i18n-dom#readme",
   "type": "module",
   "devDependencies": {
+    "@rollup/plugin-typescript": "^8.3.2",
     "husky": "^7.0.4",
     "lint-staged": "^12.4.0",
     "prettier": "2.6.2",
@@ -31,5 +32,9 @@
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"
+  },
+  "dependencies": {
+    "tslib": "^2.4.0",
+    "typescript": "^4.6.3"
   }
 }

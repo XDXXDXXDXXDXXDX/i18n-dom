@@ -1,18 +1,22 @@
-export function getAllTextNodes(el) {
+export function getAllTextNodes(el: Node): Text[] {
   let node;
   const textNodes = [];
-  const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
+  const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
   while ((node = walk.nextNode())) textNodes.push(node);
   return textNodes;
 }
 
-export function setCookie(name, value, expiresDays = 30) {
+export function setCookie(
+  name: string,
+  value: string,
+  expiresDays: number = 30
+) {
   const time = new Date();
   time.setTime(time.getTime() + expiresDays * 24 * 60 * 60 * 1000);
   document.cookie = `${name}=${value}; expires=${time.toUTCString()}`;
 }
 
-export function getCookie(name) {
+export function getCookie(name: string): string {
   const key = `${name}=`;
   const decodedCookie = decodeURIComponent(document.cookie);
   const cookieList = decodedCookie.split(";");
@@ -28,13 +32,13 @@ export function getCookie(name) {
   return "";
 }
 
-export function setSearch(name, value) {
+export function setSearch(name: string, value: string) {
   const search = new URLSearchParams(window.location.search);
   search.set(name, value);
-  window.location.search = search;
+  window.location.search = search.toString();
 }
 
-export function getSearch(name) {
+export function getSearch(name: string): string {
   const search = new URLSearchParams(window.location.search);
   return search.get(name);
 }
