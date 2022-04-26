@@ -4,6 +4,7 @@
   "compilerOptions": {
     "lib": ["ES2021", "dom"],
     "downlevelIteration": true,
-    "target": "ES6"
+    "target": "ES6",
+    "sourceMap": true
   }
 }
