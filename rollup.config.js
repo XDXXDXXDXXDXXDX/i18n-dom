@@ -12,12 +12,13 @@ export default {
     {
       file: "./dist/i18n-dom.esm.js",
       format: "esm",
-      sourcemap: true,
     },
   ],
   plugins: [
     typescript({
-      tsconfig: "./tsconfig.json",
+      compilerOptions: {
+        declaration: false,
+      },
     }),
     terser(),
   ],
