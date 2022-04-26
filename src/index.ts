@@ -17,12 +17,12 @@ const observerTextOptions = {
 };
 
 interface IInit {
-  attachNode: Node;
-  htmlLanguage: string;
-  resource: object;
-  fallbackLng: string;
-  detection: IDetectOptions;
-  language: string;
+  attachNode?: Node;
+  htmlLanguage?: string;
+  resource: { [key: string]: string[] };
+  fallbackLng?: string;
+  detection?: IDetectOptions;
+  language?: string;
 }
 
 interface IMacroContent {
