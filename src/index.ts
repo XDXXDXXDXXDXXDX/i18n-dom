@@ -80,8 +80,7 @@ class I18nDOM {
       this.startTextObserve();
     });
 
-    this.startNodeObserve();
-    this.startNodeObserve();
+    this.startObserve();
   }
 
   startTextObserve() {
