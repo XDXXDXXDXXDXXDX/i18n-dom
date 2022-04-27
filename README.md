@@ -165,7 +165,7 @@ const i18n = new I18nDOM({
   resource: {
     en: ["Welcome %name%! Your age is %age%"],
     zh: ["欢迎%name%！你的年龄是%age%"],
-    ru: ["Добро пожаловать, %имя%! Ваш возраст: %age%"],
+    ru: ["Добро пожаловать, %name%! Ваш возраст: %age%"],
   },
 });
 ```
