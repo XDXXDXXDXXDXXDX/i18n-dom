@@ -4,9 +4,9 @@ The most worry-free i18n tool in the browser.
 
 ## Introduction
 
-i18n-dom implements functions based on text nodes, so you only need to initialize the tool. No need to modify node properties, no need to introduce translated api.
+i18n-dom is a document-based multilingual tool. You only need to initialize the tool and use a default language at development time (no need to use any API or change the properties of the node), the page will automatically display the correct language based on the user's choice.
 
-When you add nodes or modify nodes, the tool will silently convert for you in the background, you only need to use your default language to develop.
+When you add nodes or modify nodes, the tool automatically converts the text to the correct language and displays it on the page.
 
 ⭐️ No need to assign a separate key to each text;
 ⭐️ The file size is very small, only 2KB. And you can get a smaller file size by opening gzip;
