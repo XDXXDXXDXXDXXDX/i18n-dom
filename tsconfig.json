@@ -5,6 +5,7 @@
     "lib": ["ES2021", "dom"],
     "downlevelIteration": true,
     "target": "ES6",
-    "declaration": true
+    "declaration": true,
+    "outDir": "dist"
   }
 }
