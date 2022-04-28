@@ -1,6 +1,6 @@
 {
   "name": "i18n-dom",
-  "version": "0.3.8",
+  "version": "0.4.0",
   "description": "The most worry-free i18n tool in the browser.",
   "main": "./dist/index.js",
   "scripts": {
