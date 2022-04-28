@@ -100,7 +100,11 @@ There are mainly six optional values: querystring, cookie, localStorage, session
 
 Macros are mainly used to solve some more complex functions or problems, such as synonyms, dynamic replacement text, etc.
 
+- Macros have a shorthand form. If you use shorthand, remember to use the shorthand form in resource as well.
+
 ### I18NDOM_KEY
+
+Shorthand: `I18N_K`
 
 Fix translation errors caused by synonyms.
 
@@ -153,6 +157,8 @@ Then use the modified text in the code, the display will automatically hide the 
 
 ### I18NDOM_DATA
 
+Shorthand: `I18N_D`
+
 There is dynamic data in the string.
 
 In situations such as displaying user information, you may need to dynamically replace certain words in a sentence.
@@ -174,7 +180,7 @@ Then use I18NDOM_DATA to insert the data content in the code, dynamically replac
 
 ```html
 <span
-  >Welcome %name%! Your age is %age% I18NDOM_DATA name=Jay Chou I18NDOM_DATA
+  >Welcome %name%! Your age is %age% I18NDOM_DATA name=Jay Chou I18N_D
   age=18</span
 >
 ```
@@ -189,6 +195,8 @@ When you use some data-responsive frameworks like React, you need to use some ha
 ```
 
 ### I18NDOM_IGNORE
+
+Shorthand: `I18N_I`
 
 Sometimes you want a piece of text not to be affected by this tool, you can use this macro, it will prohibit all translation and interpolation operations, and only remove the macro-related content from the text when it is displayed
 
@@ -207,6 +215,8 @@ The text below will not be automatically translated following language changes
 
 ```html
 <span>Hello World! I18NDOM_IGNORE</span>
+<!-- use shorthand -->
+<span>Hello World! I18N_I</span>
 ```
 
 ## Need help or need more

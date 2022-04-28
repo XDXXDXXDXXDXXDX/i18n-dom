@@ -16,6 +16,10 @@ const observerTextOptions = {
   characterData: true,
 };
 
+const macroRegex = /\s(I18NDOM|I18N)_(\S+)\s((.(?!I18N))+)/g;
+const macroIngoreRegex = /\s(I18NDOM_IGNORE|I18N_I)/;
+const hasMacroRegex = /\s(I18NDOM_|I18N_)/;
+
 interface IInit {
   attachNode?: Node;
   htmlLanguage?: string;
@@ -128,14 +132,12 @@ class I18nDOM {
   }
 
   getMacroContent(text: string): IMacroContent {
-    const matchedMacro = [
-      ...text.matchAll(/\sI18NDOM_(\S+)\s((.(?!I18NDOM_))+)/g),
-    ];
+    const matchedMacro = [...text.matchAll(macroRegex)];
+    const matchedIgnore = text.match(macroIngoreRegex);
 
-    const matchedIgnore = text.match(" I18NDOM_IGNORE");
     const isIgnore = !!matchedIgnore;
     const hasMacro = !!matchedMacro.length || isIgnore;
-    let startIndex = matchedMacro[0]?.index;
+    let startIndex = matchedMacro[0]?.index || -1;
     if (isIgnore) {
       startIndex =
         matchedMacro[0]?.index > matchedIgnore.index
@@ -148,15 +150,15 @@ class I18nDOM {
 
     if (hasMacro) {
       matchedMacro.forEach((info) => {
-        // info = ["match content", "main macro key", "main content"]
-        let key = info[1];
-        if (key === "DATA") {
-          const matchedDetail = [...info[2].matchAll(/(\S+)=(.*)/g)][0];
+        // info = ["match content", "I18NDOM_IGNORE | I18N_I", "main macro key", "main content"]
+        let key = info[2];
+        if (key === "DATA" || key === "D") {
+          const matchedDetail = [...info[3].matchAll(/(\S+)=(.*)/g)][0];
           matchedData.push({
             key: matchedDetail[1],
             value: matchedDetail[2],
           });
-        } else if (key === "KEY") {
+        } else if (key === "KEY" || key === "K") {
           matchedKey = matchedKey + info[0];
         }
       });
@@ -172,8 +174,10 @@ class I18nDOM {
   }
 
   clearMacroInfo(text: string): string {
-    const macroStartIndex = text.indexOf(" I18NDOM_");
-    return macroStartIndex !== -1 ? text.substring(0, macroStartIndex) : text;
+    const macroStartIndex = text.match(hasMacroRegex)?.index;
+    return macroStartIndex !== undefined
+      ? text.substring(0, macroStartIndex)
+      : text;
   }
 
   translateNodeTree(root: Node, originalLanguage: string) {
@@ -186,7 +190,7 @@ class I18nDOM {
     const originalText = node.data;
     const nextNode = node.nextSibling as Comment;
     const hasI18NDOMComment =
-      nextNode?.nodeType === 8 && nextNode.data.includes("I18NDOM_");
+      nextNode?.nodeType === 8 && hasMacroRegex.test(nextNode.data);
 
     let textInResource = originalText;
     let comment = null;

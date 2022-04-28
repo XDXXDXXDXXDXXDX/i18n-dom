@@ -8,6 +8,9 @@ const observerTextOptions = {
     subtree: true,
     characterData: true,
 };
+const macroRegex = /\s(I18NDOM|I18N)_(\S+)\s((.(?!I18N))+)/g;
+const macroIngoreRegex = /\s(I18NDOM_IGNORE|I18N_I)/;
+const hasMacroRegex = /\s(I18NDOM_|I18N_)/;
 class I18nDOM {
     constructor({ attachNode, htmlLanguage, resource, language, fallbackLng, detection, }) {
         this.attachNode = attachNode || document.body;
@@ -37,8 +40,7 @@ class I18nDOM {
             });
             this.startTextObserve();
         });
-        this.startNodeObserve();
-        this.startNodeObserve();
+        this.startObserve();
     }
     startTextObserve() {
         this.textObserver.observe(this.attachNode, observerTextOptions);
@@ -80,13 +82,11 @@ class I18nDOM {
     }
     getMacroContent(text) {
         var _a, _b, _c;
-        const matchedMacro = [
-            ...text.matchAll(/\sI18NDOM_(\S+)\s((.(?!I18NDOM_))+)/g),
-        ];
-        const matchedIgnore = text.match(" I18NDOM_IGNORE");
+        const matchedMacro = [...text.matchAll(macroRegex)];
+        const matchedIgnore = text.match(macroIngoreRegex);
         const isIgnore = !!matchedIgnore;
         const hasMacro = !!matchedMacro.length || isIgnore;
-        let startIndex = (_a = matchedMacro[0]) === null || _a === void 0 ? void 0 : _a.index;
+        let startIndex = ((_a = matchedMacro[0]) === null || _a === void 0 ? void 0 : _a.index) || -1;
         if (isIgnore) {
             startIndex =
                 ((_b = matchedMacro[0]) === null || _b === void 0 ? void 0 : _b.index) > matchedIgnore.index
@@ -97,16 +97,16 @@ class I18nDOM {
         let matchedKey = "";
         if (hasMacro) {
             matchedMacro.forEach((info) => {
-                // info = ["match content", "main macro key", "main content"]
-                let key = info[1];
-                if (key === "DATA") {
-                    const matchedDetail = [...info[2].matchAll(/(\S+)=(.*)/g)][0];
+                // info = ["match content", "I18NDOM_IGNORE | I18N_I", "main macro key", "main content"]
+                let key = info[2];
+                if (key === "DATA" || key === "D") {
+                    const matchedDetail = [...info[3].matchAll(/(\S+)=(.*)/g)][0];
                     matchedData.push({
                         key: matchedDetail[1],
                         value: matchedDetail[2],
                     });
                 }
-                else if (key === "KEY") {
+                else if (key === "KEY" || key === "K") {
                     matchedKey = matchedKey + info[0];
                 }
             });
@@ -120,8 +120,11 @@ class I18nDOM {
         };
     }
     clearMacroInfo(text) {
-        const macroStartIndex = text.indexOf(" I18NDOM_");
-        return macroStartIndex !== -1 ? text.substring(0, macroStartIndex) : text;
+        var _a;
+        const macroStartIndex = (_a = text.match(hasMacroRegex)) === null || _a === void 0 ? void 0 : _a.index;
+        return macroStartIndex !== undefined
+            ? text.substring(0, macroStartIndex)
+            : text;
     }
     translateNodeTree(root, originalLanguage) {
         const allNode = getAllTextNodes(root);
@@ -132,7 +135,7 @@ class I18nDOM {
     translateTextNode(node, originalLanguage) {
         const originalText = node.data;
         const nextNode = node.nextSibling;
-        const hasI18NDOMComment = (nextNode === null || nextNode === void 0 ? void 0 : nextNode.nodeType) === 8 && nextNode.data.includes("I18NDOM_");
+        const hasI18NDOMComment = (nextNode === null || nextNode === void 0 ? void 0 : nextNode.nodeType) === 8 && hasMacroRegex.test(nextNode.data);
         let textInResource = originalText;
         let comment = null;
         let dataContent = [];
