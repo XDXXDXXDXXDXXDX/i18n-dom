@@ -6,6 +6,6 @@
     "downlevelIteration": true,
     "target": "ES6",
     "declaration": true,
-    "outDir": "dist"
+    "outDir": "lib"
   }
 }
